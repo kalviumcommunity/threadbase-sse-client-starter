@@ -1,4 +1,5 @@
-// hooks/useSSE.js
+
+ // hooks/useSSE.js
 // ─────────────────────────────────────────────────────────────
 // TASK 1: implement this hook so the React app can receive
 //         server-sent events from /api/notifications/stream.
@@ -32,8 +33,31 @@ export function useSSE(url, onMessage) {
 
   useEffect(() => {
     // TODO: implement the hook body here.
-    // Remove this comment and the line below when you are done.
-    return;
 
-  }, [url, user, onMessage]);
+    // TODO 1: Add the null guard.
+    if (!user) return;
+
+    // TODO 2: Create the EventSource connection.
+    const source = new EventSource(url, {
+      withCredentials: true,
+    });
+
+    // TODO 3: Handle incoming messages and parse JSON.
+    source.onmessage = (event) => {
+      try {
+        onMessage(JSON.parse(event.data));
+      } catch (e) {
+        console.error("[useSSE] parse error:", event.data);
+      }
+    };
+
+    // TODO 4: Log connection errors.
+    source.onerror = (err) => {
+      console.error("[useSSE] error:", err);
+    };
+
+    // TODO 5: Close the connection during cleanup.
+    return () => source.close();
+
+  }, [url, user, onMessage]); // TODO 6: Keep these dependencies.
 }
