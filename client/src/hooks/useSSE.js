@@ -24,7 +24,7 @@
 //
 // Do NOT change the function signature or the export.
 // ─────────────────────────────────────────────────────────────
-import { useEffect } from "react";
+/*import { useEffect } from "react";
 import { useAuth } from "../auth/AuthContext.jsx";
 
 export function useSSE(url, onMessage) {
@@ -36,4 +36,45 @@ export function useSSE(url, onMessage) {
     return;
 
   }, [url, user, onMessage]);
+}*/
+//```javascript
+import { useEffect } from "react";
+import { useAuth } from "../auth/AuthContext.jsx";
+
+export function useSSE(url, onMessage) {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Stop if the user is not logged in.
+    if (!user) {
+      return;
+    }
+
+    // Create an SSE connection with credentials.
+    const source = new EventSource(url, {
+      withCredentials: true,
+    });
+
+    // Handle incoming messages.
+    source.onmessage = (event) => {
+      try {
+        const parsedData = JSON.parse(event.data);
+        onMessage(parsedData);
+      } catch (error) {
+        console.error("Error parsing SSE message:", error);
+      }
+    };
+
+    // Handle connection errors.
+    source.onerror = (error) => {
+      console.error("SSE connection error:", error);
+    };
+
+    // Close the connection when the effect is cleaned up.
+    return () => {
+      source.close();
+    };
+  }, [url, user, onMessage]);
 }
+
+
