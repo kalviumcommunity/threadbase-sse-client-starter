@@ -33,7 +33,24 @@ export function useSSE(url, onMessage) {
   useEffect(() => {
     // TODO: implement the hook body here.
     // Remove this comment and the line below when you are done.
-    return;
+    if(!user){
+      return;
+    }
+    const source = new EventSource(url, {withCredentials:true,});
+    source.onmessage=(event)=>{
+      try{
+        const parasedData = JSON.parse(event.data);
+        onMessage(parseData);
+      }catch(error){
+        console.error("Error parsing SSE message:",error);
+      }
+    };
+    source.onerror=(error)=>{
+      console.error("SSE connection error:", error);
+    };
+    return () =>{
+      source.close();
+    }
 
   }, [url, user, onMessage]);
 }
