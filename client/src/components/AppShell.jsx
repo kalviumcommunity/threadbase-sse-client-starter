@@ -20,9 +20,18 @@
 //   useNotifications  from "../context/NotificationContext.jsx"
 // ─────────────────────────────────────────────────────────────
 import NavBar from "./NavBar.jsx";
+import { useCallback } from "react";
+import {useSSE} from "../hooks/useSSE.js";
+import {useNotifications} from "../context/NotificationContext.jsx";
 
 export default function AppShell({ children }) {
+  const {dispatch} = useNotifications();
+  const handleMessage = useCallback(
+//          (data) => dispatch({ type: "ADD_NOTIFICATION", payload: data }),
+//          [dispatch]
+//        );
   // TODO: add the three steps described above.
+  useSSE("/api/notifications/stream", handleMessage));
 
   return (
     <div>
